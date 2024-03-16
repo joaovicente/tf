@@ -1,0 +1,4 @@
+exiftool/*
+test/*
+venv/*
+tf_old.py
