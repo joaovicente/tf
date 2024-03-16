@@ -55,7 +55,8 @@ def transform_video(input_file: str, dry_run: bool, force: bool, log_level: str)
         # exiftool renames original file appending _original to it (e.g. myvideo.MP4_original)
         exiftool_renamed_file = output_file + '_original'
         logging.debug(f'Removing exiftool renamed file "{exiftool_renamed_file}"')
-        os.remove(exiftool_renamed_file)
+        if os.path.exists(exiftool_renamed_file):
+            os.remove(exiftool_renamed_file)
         logging.info(f'"{output_file}" created')
 
 
@@ -99,7 +100,8 @@ def main(output_format, dryrun, force, log_level, recursive, input_files=None):
 
 class RawFormatter(argparse.HelpFormatter):
     def _fill_text(self, text, width, indent):
-        return "\n".join([textwrap.fill(line, width) for line in textwrap.indent(textwrap.dedent(text), indent).splitlines()])
+        return "\n".join(
+            [textwrap.fill(line, width) for line in textwrap.indent(textwrap.dedent(text), indent).splitlines()])
 
 
 description = "Transform videos to MP4 format"
@@ -128,7 +130,8 @@ if __name__ == "__main__":
     parser.add_argument("input_files", nargs="+", help="Files to transform")
     parser.add_argument("-d", "--dryrun", action="store_true", help="Perform a dry run (skip transformation)")
     parser.add_argument("-f", "--force", action="store_true", help="Force transformation even if output file exists")
-    parser.add_argument("-l", "--log-level", help="Log level", choices=["DEBUG", "INFO", "WARNING", "ERROR"], default="INFO")
+    parser.add_argument("-l", "--log-level", help="Log level", choices=["DEBUG", "INFO", "WARNING", "ERROR"], 
+                        default="INFO")
     parser.add_argument("-o", "--output-format",  help="Output format", required=False)
     parser.add_argument("-r", "--recursive", action="store_true", help="Transform files in sub folders")
     args = parser.parse_args()
