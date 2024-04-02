@@ -106,8 +106,10 @@ class RawFormatter(argparse.HelpFormatter):
 
 description = "Transform videos to MP4 format"
 usage = '''
-    ## Pre-requirement:
+    ## Pre-requirements:
+    Install python dependencies fmpeg and pyexiftool
     Build and install exiftool as per https://exiftool.org/install.html#Unix
+    sudo apt install ffmpeg 
 
     ## Usage examples:
     # Transform single video to MP4
@@ -119,7 +121,7 @@ usage = '''
     specific folder
     $ python tf.py any-file-under-this-folder/*
 
-    # Transform all videos from a folder and children to MP4
+    # Transform all videos from a folder and their children to MP4
     $ python tf.py -r /path/to/media
 '''
 if __name__ == "__main__":
