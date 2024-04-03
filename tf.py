@@ -65,7 +65,8 @@ def transform_video(input_file: str, dry_run: bool, force: bool, erase: bool, lo
 
 
 def supported_input_format(input_file):
-    allowed_extensions = ('MKV', 'AVI', 'MPG', 'WMV', 'MOV', 'M4V', '3GP', 'MPEG', 'MPE', 'OGM', 'FLV', 'DIVX', 'VOB', 'QT')
+    allowed_extensions = ('MKV', 'AVI', 'MPG', 'WMV', 'MOV', 'M4V', '3GP', 'MPEG', 'MPE', 'OGM', 'FLV', 'DIVX', 'VOB',
+                          'QT')
     return input_file.split('.')[-1].upper() in allowed_extensions
 
 
@@ -134,11 +135,12 @@ if __name__ == "__main__":
     parser.add_argument("input_files", nargs="+", help="Files to transform")
     parser.add_argument("-d", "--dryrun", action="store_true", help="Perform a dry run (skip transformation)")
     parser.add_argument("-f", "--force", action="store_true", help="Force transformation even if output file exists")
-    parser.add_argument("-l", "--log-level", help="Log level", choices=["DEBUG", "INFO", "WARNING", "ERROR"], 
+    parser.add_argument("-l", "--log-level", help="Log level", choices=["DEBUG", "INFO", "WARNING", "ERROR"],
                         default="INFO")
     parser.add_argument("-o", "--output-format",  help="Output format", required=False)
     parser.add_argument("-r", "--recursive", action="store_true", help="Transform files in sub folders")
-    parser.add_argument("-e", "--erase", action="store_true", help="Erase original if tranformation was previously sucessful")
+    parser.add_argument("-e", "--erase", action="store_true",
+                        help="Erase original if tranformation was previously successful")
     args = parser.parse_args()
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging._nameToLevel[args.log_level])
     main(args.output_format, args.dryrun, args.force, args.log_level, args.recursive, args.erase, args.input_files)
