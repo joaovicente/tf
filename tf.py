@@ -17,7 +17,7 @@ def ffmpeg_log_level(log_level: str):
     return log_level_map[log_level]
 
 
-def transform_video(input_file: str, dry_run: bool, force: bool, log_level: str):
+def transform_video(input_file: str, dry_run: bool, force: bool, erase: bool, log_level: str):
     """
     Converts a file to mp4. Requires ffmpeg and libx264
     input_file -- The file to convert
@@ -44,7 +44,11 @@ def transform_video(input_file: str, dry_run: bool, force: bool, log_level: str)
             logging.info(f'"{output_file}" already exists. deleting before transformation.')
             os.remove(output_file)
         else:
-            logging.warning(f'"{output_file}" already exists. Skipping transformation.')
+            if erase:
+                logging.warning(f'"{input_file}" already transformed. Deleting.')
+                os.remove(input_file)
+            else:
+                logging.warning(f'"{output_file}" already exists. Skipping transformation.')
             return
     # Transform video now
     if not dry_run:
@@ -61,17 +65,17 @@ def transform_video(input_file: str, dry_run: bool, force: bool, log_level: str)
 
 
 def supported_input_format(input_file):
-    allowed_extensions = ('MKV', 'AVI', 'MPG', 'WMV', 'MOV', 'M4V', '3GP', 'MPEG', 'MPE', 'OGM', 'FLV', 'DIVX', 'VOB')
+    allowed_extensions = ('MKV', 'AVI', 'MPG', 'WMV', 'MOV', 'M4V', '3GP', 'MPEG', 'MPE', 'OGM', 'FLV', 'DIVX', 'VOB', 'QT')
     return input_file.split('.')[-1].upper() in allowed_extensions
 
 
-def dispatch_transformation(input_file_list, dryrun, force, log_level):
+def dispatch_transformation(input_file_list, dryrun, force, erase, log_level):
     for file in input_file_list:
         if supported_input_format(file):
-            transform_video(file, dryrun, force, log_level)
+            transform_video(file, dryrun, force, erase, log_level)
 
 
-def main(output_format, dryrun, force, log_level, recursive, input_files=None):
+def main(output_format, dryrun, force, log_level, recursive, erase, input_files=None):
     logging.debug(f'Input file: "{input_files}"')
     logging.debug(f'Output format: {output_format}')
     logging.debug(f'Dry run: {dryrun}')
@@ -93,9 +97,9 @@ def main(output_format, dryrun, force, log_level, recursive, input_files=None):
                     for filename in files:
                         file_path = os.path.join(root, filename)
                         recursive_file_list.append(file_path)
-                dispatch_transformation(recursive_file_list, dryrun, force, log_level)
+                dispatch_transformation(recursive_file_list, dryrun, force, erase, log_level)
     else:
-        dispatch_transformation(input_files, dryrun, force, log_level)
+        dispatch_transformation(input_files, dryrun, force, erase, log_level)
 
 
 class RawFormatter(argparse.HelpFormatter):
@@ -106,10 +110,8 @@ class RawFormatter(argparse.HelpFormatter):
 
 description = "Transform videos to MP4 format"
 usage = '''
-    ## Pre-requirements:
-    Install python dependencies fmpeg and pyexiftool
+    ## Pre-requirement:
     Build and install exiftool as per https://exiftool.org/install.html#Unix
-    sudo apt install ffmpeg 
 
     ## Usage examples:
     # Transform single video to MP4
@@ -121,7 +123,7 @@ usage = '''
     specific folder
     $ python tf.py any-file-under-this-folder/*
 
-    # Transform all videos from a folder and their children to MP4
+    # Transform all videos from a folder and children to MP4
     $ python tf.py -r /path/to/media
 '''
 if __name__ == "__main__":
@@ -136,6 +138,7 @@ if __name__ == "__main__":
                         default="INFO")
     parser.add_argument("-o", "--output-format",  help="Output format", required=False)
     parser.add_argument("-r", "--recursive", action="store_true", help="Transform files in sub folders")
+    parser.add_argument("-e", "--erase", action="store_true", help="Erase original if tranformation was previously sucessful")
     args = parser.parse_args()
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging._nameToLevel[args.log_level])
-    main(args.output_format, args.dryrun, args.force, args.log_level, args.recursive, args.input_files)
+    main(args.output_format, args.dryrun, args.force, args.log_level, args.recursive, args.erase, args.input_files)
