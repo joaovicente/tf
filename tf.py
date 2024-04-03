@@ -23,8 +23,16 @@ def transform_video(input_file: str, dry_run: bool, force: bool, erase: bool, lo
     input_file -- The file to convert
     dry_run -- Whether to actually convert the file
     """
+
+    input_format = input_file.split('.')[-1].upper()
     output_file = ".".join(input_file.split('.')[:-1]) + '.MP4'
-    ffmpeg_command = f'ffmpeg -loglevel {ffmpeg_log_level(log_level)} -i "{input_file}" -c:v libx264 -strict -2 -preset slow -pix_fmt yuv420p "{output_file}"'
+    base_command = f'ffmpeg -loglevel {ffmpeg_log_level(log_level)} -i "{input_file}" ' +\
+        '-c:v libx264 -strict -2 -preset slow -pix_fmt yuv420p'
+    if input_format in ['VOB', 'MPG']:
+        # https://superuser.com/a/1106786
+        ffmpeg_command = f'{base_command} -c:v copy -c:a copy "{output_file}"'
+    else:
+        ffmpeg_command = f'{base_command} "{output_file}"'
 
     if not dry_run:
         logging.info(f'Transforming "{input_file}" to "{output_file}"')
