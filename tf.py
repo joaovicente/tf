@@ -25,7 +25,7 @@ def transform_video(input_file: str, dry_run: bool, force: bool, erase: bool, lo
     """
 
     input_format = input_file.split('.')[-1].upper()
-    output_file = ".".join(input_file.split('.')[:-1]) + '.MP4'
+    output_file = ".".join(input_file.split('.')[:-1]) + '.mp4'
     base_command = f'ffmpeg -loglevel {ffmpeg_log_level(log_level)} -i "{input_file}" ' +\
         '-c:v libx264 -strict -2 -preset slow -pix_fmt yuv420p'
     if input_format in ['VOB', 'MPG']:
