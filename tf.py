@@ -36,6 +36,7 @@ def transform_video(input_file: str, dry_run: bool, force: bool, erase: bool, lo
 
     if not dry_run:
         logging.info(f'Transforming "{input_file}" to "{output_file}"')
+        logging.info(f'{base_command}')
     else:
         logging.info(f'Simulating transformation of "{input_file}" to "{output_file}"')
     if not os.path.exists(input_file):
